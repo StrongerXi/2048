@@ -1,39 +1,44 @@
 from game.game_state import GameState
 from game.movement import move_board, Direction
+import game.movement
 import settings
 
 #TODO:
-# 1. We need a moved? boolean to determine whether to generate random tiles or not
-# 2. The count field should be included in game state
-# 3. We need a score field, to keep all the scores
-# 4. To accomplish 3 efficiently, we should make movement into a class,
-# so that it can access the score field
-# Or make it return the obtained score for each move_board
-# instead of returning a moved board
+# 1. The game_runner uses the moved global variable from movement module
+#    This module might need to be changed into a movement class
+#    So that multiple module/classes could access movement class and has
+#    Their own moved instance, instead of relying on only one
+
+
 
 class GameRunner():
 
     def __init__(self):
-        self.gs = GameState(settings.BOARD_SIZE)
+        self.gs = GameState(settings.BOARD_DEFAULT_SIZE)
+        self.board = self.gs.board
 
 
     def run(self):
         ipt = ""
-        self.gs.generate_random_tile()
+        self.board.generate_random_tile()
 
+        while  (ipt != "exit" and self.board.check_board_moveable()):
 
-        while not (ipt == "exit" or self.gs.check_game_over()):
-
-            self.gs.print_board()
+            print("\n\ncurrent score: ", self.gs.get_score())
+            self.board.print_board()
             dir = input("please enter 'w' for up, 's' for down, 'a' for left, and 'd' for right, anything else for exit game\n")
             ipt = get_movement(dir)
-            self.gs.board = move_board(self.gs, ipt)
-            self.gs.generate_random_tile()
+
+            round_score = move_board(self.board, ipt)
+
+            if game.movement.moved:
+                self.board.generate_random_tile()
+            self.gs.add_score(round_score)
 
 
         if ipt != "exit":
             print("Sorry, you have lost the game")
-            self.gs.print_board()
+            self.board.print_board()
 
         else:
             print("why quit, dude?")
