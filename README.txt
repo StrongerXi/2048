@@ -5,3 +5,5 @@ This Project involves:
 	2. Implementing an AI that is able to play the game and make moves that optimize score
 
 	3. Developing a method to self-prune the parameter in the evaluation function for a board state
+
+..
