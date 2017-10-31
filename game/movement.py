@@ -1,15 +1,17 @@
 from enum import Enum
-from copy import deepcopy
-
+import random
 # This Class Involves the following:
 # - Direction Enum for moving the board
 # - Move board in any Direction
 # - Helper functions that move/merge row/column
+# - A global boolean variable moved that helps game_runner
+#   determine whether an attempted movement has been effective
 
 # Note:
 #       - The functions in this module must take in a Board Class
+#       - The tests.movement_test module might give some insights to the mechanism of moving.
 
-moved = False
+moved = True
 
 class Direction(Enum):
 
@@ -17,6 +19,20 @@ class Direction(Enum):
     down  = "down"
     left  = "left"
     right = "right"
+
+    @staticmethod
+    def get_random_direction():
+        randnum = random.randint(0,3)
+
+        if randnum == 0:
+            return Direction.up
+        elif randnum == 1:
+            return Direction.right
+        elif randnum == 2:
+            return Direction.down
+        else:
+            return Direction.left
+
 
 
 # Board Direction -> List-of List (game board)
@@ -179,7 +195,7 @@ def merge_left_row(pseudo_row):
 
             pseudo_row[index-1] *= 2
             pseudo_row[index] = 0
-            score = pseudo_row[index-1]
+            score += pseudo_row[index-1]
 
             global moved
             moved = True

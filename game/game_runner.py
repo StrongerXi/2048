@@ -63,12 +63,5 @@ def get_movement(dir):
 
 
 
-runner = GameRunner()
-runner.run()
-
-
-
-
-
 
 

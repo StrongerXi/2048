@@ -43,10 +43,13 @@ class Board():
     def get_col(self, col):
         return self.__board[:, col]
 
-    def get_board_copy(self):
-        copyboard = Board()
-        copyboard.set_board(np.copy(self.__board))
-        return copyboard
+    # Board -> np.array
+    # returns a copy of the game board
+    def copy_board(self):
+        copy = Board()
+        copy.__board = np.copy(self.__board)
+        return copy
+
 
     # Board Int Int NNN -> _
     # Set the specified tile to given value
@@ -66,11 +69,6 @@ class Board():
         target_row = self.get_row(row_index)
         for index in range(0,self.board_size):
             target_row[index] = input_row[index]
-
-    def set_board(self,board):
-        self.__board = board
-
-
 
     # Print out the board at console
     def print_board(self):
@@ -100,6 +98,10 @@ class Board():
     # that are adjacent to it.
     # If not, return False
     def check_tile_moveable(self,row,col):
+
+        if self.get_empty_count() != 0:
+            return True
+
         target_tile = self.get_tile(row,col)
         for n in range(-1,2,2):
 
@@ -120,16 +122,16 @@ class Board():
 
         return empty_count
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if self.board_size != other.board_size:
             raise Exception("error, board sizes do not match for the boards being compared")
 
         for r in range(0,self.board_size):
             for c in range(0,self.board_size):
                 if self.get_tile(r,c) != other.get_tile(r,c):
-                    return -1
+                    return False
 
-        return 0
+        return True
 
     # This function generates random tile within the non-empty tiles
     # It first generates a random number within (0, empty-tile-counts)
@@ -169,4 +171,3 @@ class Board():
                 r.append(0)
             board.append(r)
         return board
-
