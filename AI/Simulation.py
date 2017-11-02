@@ -2,6 +2,7 @@
 from game.game_state import GameState
 from game.movement import move_board
 import game.movement
+from AI.evaluation import board_evaluator_in_dir, evaluate_available_moves, find_optimized_move, evaluate_board_state
 
 import settings
 
@@ -12,6 +13,135 @@ class Simulation:
 
         self.gs = GameState()
         self.gs.board.generate_random_tile()
+
+
+
+
+    # This simulator is similar to evaluation simulator
+    # however, it implements prediction moves so that the movement won't
+    # focus on maximizing scores for each move; instead, the ai also considers
+    # how each move will affect the board in the preceding rounds.
+    def evaluation_with_prediction_simulator(self,rounds = 1):
+
+        rounds = rounds
+
+        scores = []
+
+        while rounds > 0:
+
+            print("round: ", rounds)
+            score = self.evaluation_with_prediction_single_simulation()
+            scores.append(score)
+            rounds -= 1
+
+        print("scores for the rounds simulated are: ", scores)
+
+
+    def evaluation_with_prediction_single_simulation(self):
+
+        self.gs.reset()
+        self.gs.board.generate_random_tile()
+
+        simFlag = True
+
+        while simFlag:
+
+            self.gs.board.print_board()
+            print("score: ", self.gs.get_score(), "\n\n\n")
+
+
+            moves_and_scores = self.evaluate_and_predict_optmized_move()
+            optimizedDir = find_optimized_move(moves_and_scores)
+            round_score = move_board(self.gs.board, optimizedDir)
+
+            self.gs.board.generate_random_tile()
+            self.gs.add_score(round_score)
+
+
+            if not self.gs.board.check_board_moveable():
+                simFlag = False
+
+
+
+        print("Simulation has ended")
+
+        return self.gs.get_score()
+
+    def evaluate_and_predict_optmized_move(self):
+
+        scores = {settings.Direction.up: 0, settings.Direction.right: 0, settings.Direction.left: 0,
+                  settings.Direction.down: 0}
+
+        for dir in settings.Direction:
+            move_board(self.gs.board.copy_board(),dir)
+            if not game.movement.moved:
+                  scores.pop(dir)
+            else:
+                copy_board = self.gs.board.copy_board()
+                move_score = move_board(copy_board,dir)
+                board_state_score = evaluate_board_state(copy_board)
+                scores[dir] = move_score + board_state_score
+
+        return scores
+
+
+
+    #
+    # This simulator uses evaluation_simulation to make optimized move, and simulates the game
+    def evaluation_simulator(self,rounds = 1):
+
+        rounds = rounds
+
+        scores = []
+
+        while rounds > 0:
+
+            print("round: ", rounds)
+            score = self.evaluation_single_simulation()
+            scores.append(score)
+            rounds -= 1
+
+        print("scores for the rounds simulated are: ", scores)
+
+
+
+
+
+    #This function uses a evaluator function to find the optimized moving direction
+    # It simulates by making the corresponding move.
+    #
+    def evaluation_single_simulation(self):
+
+        self.gs.reset()
+        self.gs.board.generate_random_tile()
+
+        simFlag = True
+
+        while simFlag:
+
+            self.gs.board.print_board()
+            print("score: ", self.gs.get_score(), "\n\n\n")
+
+
+            moves_score = evaluate_available_moves(self.gs.board.copy_board())
+            optimizedDir = find_optimized_move(moves_score)
+            round_score = move_board(self.gs.board, optimizedDir)
+
+            self.gs.board.generate_random_tile()
+            self.gs.add_score(round_score)
+
+
+            if not self.gs.board.check_board_moveable():
+                simFlag = False
+
+
+        print("Simulation has ended")
+
+        return self.gs.get_score()
+
+
+
+
 
 
     # NNN NNN NNN -> Void

@@ -43,6 +43,9 @@ class Board():
     def get_col(self, col):
         return self.__board[:, col]
 
+    def get_board(self):
+        return np.copy(self.__board)
+
     # Board -> np.array
     # returns a copy of the game board
     def copy_board(self):
