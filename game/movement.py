@@ -1,5 +1,5 @@
-from enum import Enum
 import random
+import settings
 # This Class Involves the following:
 # - Direction Enum for moving the board
 # - Move board in any Direction
@@ -11,27 +11,24 @@ import random
 #       - The functions in this module must take in a Board Class
 #       - The tests.movement_test module might give some insights to the mechanism of moving.
 
+
+
 moved = True
 
-class Direction(Enum):
 
-    up    = "up"
-    down  = "down"
-    left  = "left"
-    right = "right"
 
-    @staticmethod
-    def get_random_direction():
+@staticmethod
+def get_random_direction():
         randnum = random.randint(0,3)
 
         if randnum == 0:
-            return Direction.up
+            return settings.Direction.up
         elif randnum == 1:
-            return Direction.right
+            return settings.Direction.right
         elif randnum == 2:
-            return Direction.down
+            return settings.Direction.down
         else:
-            return Direction.left
+            return settings.Direction.left
 
 
 
@@ -45,13 +42,13 @@ def move_board(board , dir):
 
     score = 0
 
-    if dir == Direction.up:
+    if dir == settings.Direction.up:
         score = move_up(board)
-    if dir == Direction.down:
+    if dir == settings.Direction.down:
         score = move_down(board)
-    if dir == Direction.left:
+    if dir == settings.Direction.left:
         score = move_left(board)
-    if dir == Direction.right:
+    if dir == settings.Direction.right:
         score = move_right(board)
 
 

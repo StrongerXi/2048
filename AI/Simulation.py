@@ -1,6 +1,6 @@
 
 from game.game_state import GameState
-from game.movement import Direction, move_board
+from game.movement import move_board
 import game.movement
 
 import settings
@@ -11,8 +11,7 @@ class Simulation:
     def __init__(self):
 
         self.gs = GameState()
-        self.board = self.gs.board
-        self.board.generate_random_tile()
+        self.gs.board.generate_random_tile()
 
 
     # NNN NNN NNN -> Void
@@ -23,26 +22,51 @@ class Simulation:
     # A single simulation breaks when:
     #
 
-    def random_simulator(self,rounds, num_of_steps = settings.DEFAULT_NUMBER_OF_STEPS, sim_in_dir = settings.DEFAULT_SIMULATIONS_IN_EACH_DIRECTION):
+    def random_simulator(self,rounds = 1, num_of_steps = settings.DEFAULT_NUMBER_OF_STEPS, sim_in_dir = settings.DEFAULT_SIMULATIONS_IN_EACH_DIRECTION):
 
-        simFlag = True
+        rounds = rounds
 
-        while simFlag:
+        scores = []
 
-            if not self.board.check_board_moveable():
-                simFlag = False
-                break
+        while rounds > 0:
 
-            self.board.print_board()
+            print("round: ", rounds)
+            score = self.random_single_simulation(num_of_steps,sim_in_dir)
+            scores.append(score)
+            rounds -= 1
+
+        print("scores for the rounds simulated are: ", scores)
+
+
+
+
+
+    # This Function simulates a single simulation
+    # It starts with resetting and ends when the board is not moveable in any direction
+    def random_single_simulation(self, num_of_steps, sim_in_dir):
+
+        self.gs.reset()
+
+        self.gs.board.generate_random_tile()
+        Simflag = True
+
+        while Simflag:
+
+            self.gs.board.print_board()
             print("score: ", self.gs.get_score(), "\n\n\n")
 
             optimizedDir = self.random_simulate(num_of_steps, sim_in_dir)
-            round_score = move_board(self.board, optimizedDir)
-            self.board.generate_random_tile()
+            round_score = move_board(self.gs.board, optimizedDir)
+            self.gs.board.generate_random_tile()
             self.gs.add_score(round_score)
 
-        self.board.print_board()
+            if not self.gs.board.check_board_moveable():
+                Simflag = False
+                self.gs.board.generate_random_tile()
 
+        print("simulation ended.")
+
+        return self.gs.get_score()
 
 
 
@@ -56,15 +80,15 @@ class Simulation:
     # It returns the direction that yields the best average score
     def random_simulate(self, num_of_steps, sim_in_dir):
 
-        scores = {Direction.up: 0, Direction.right: 0, Direction.left: 0, Direction.down: 0}
+        scores = {settings.Direction.up: 0, settings.Direction.right: 0, settings.Direction.left: 0, settings.Direction.down: 0}
 
-        for dir in Direction:
+        for dir in settings.Direction:
 
             scores[dir] += self.random_simulate_in_direction(dir, num_of_steps, sim_in_dir)
 
-        max_dir = Direction.up
+        max_dir = settings.Direction.up
 
-        for dir in Direction:
+        for dir in settings.Direction:
             if scores[dir] > scores[max_dir]:
                 max_dir = dir
             print(dir, scores[dir])
@@ -79,7 +103,7 @@ class Simulation:
     # the random moves
     def random_simulate_in_direction(self, dir, numberOfSteps, totalSims):
 
-        board = self.board.copy_board()
+        board = self.gs.board.copy_board()
 
         total_score = move_board(board,dir)
         if not game.movement.moved:

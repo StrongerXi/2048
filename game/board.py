@@ -164,6 +164,7 @@ class Board():
     # Initialize the game board
     @staticmethod
     def initialize_board(size):
+
         board = []
         for row in range(0,size):
             r = []

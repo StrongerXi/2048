@@ -1,5 +1,5 @@
 from game.game_state import GameState
-from game.movement import move_board, Direction
+from game.movement import move_board
 import game.movement
 import settings
 
@@ -48,13 +48,13 @@ class GameRunner():
 
 def get_movement(dir):
     if dir == "w":
-        return Direction.up
+        return settings.Direction.up
     if dir == "s":
-        return Direction.down
+        return settings.Direction.down
     if dir == "a":
-        return Direction.left
+        return settings.Direction.left
     if dir == "d":
-        return Direction.right
+        return settings.Direction.right
 
     return "exit"
 

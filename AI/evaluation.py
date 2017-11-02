@@ -24,3 +24,5 @@ import settings
 
 
 # In the move functions, still calculate the raw score obtained from combining tiles
+
+
