@@ -5,7 +5,7 @@ from enum import Enum
 
 # Board Constants
 BOARD_DEFAULT_SIZE = 4
-TILE_TWO_PROBABILITY = 0.6
+TILE_TWO_PROBABILITY = 0.9
 TILE_BASE_VALUE = 2
 
 

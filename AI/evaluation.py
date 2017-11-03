@@ -11,6 +11,7 @@ import game.board
 # Ideas: for size = 4
 
 # TODO: #There should be a penalty for rows such as [256,32,4,0], when the differences are too large
+#       # Try creating a dynamic tile/row weight based on the location of largest tile
         #Also, the constants need to be adjusted, and it is suggested that the programmer reads through several
         #entire simulations to identify the reasons that keeps AI from scoring higher
         #Random Simulation stopped moving even though the board is still moveable
@@ -36,6 +37,32 @@ import game.board
 
 
 # In the move functions, still calculate the raw score obtained from combining tiles
+
+
+def deep_evaluate_board_state(board):
+
+    all_possible_state_scores = np.array([],np.int32)
+
+    for row in range(0,board.board_size):
+
+        for col in range(board.board_size):
+
+            if board.get_tile(row,col) == 0:
+                state_score = 0
+                pop_base_tile_board = board.copy_board()
+
+                pop_base_tile_board.set_tile(row,col,settings.TILE_BASE_VALUE)
+                state_score += settings.TILE_TWO_PROBABILITY * evaluate_board_state(pop_base_tile_board)
+
+                pop_double_base_tile_board = board.copy_board()
+
+                pop_double_base_tile_board.set_tile(row, col, 2*settings.TILE_BASE_VALUE)
+                state_score += (1 - settings.TILE_TWO_PROBABILITY) * evaluate_board_state(pop_double_base_tile_board)
+
+                all_possible_state_scores = np.append(all_possible_state_scores,state_score)
+
+    return np.median(all_possible_state_scores)
+
 
 # Board -> Number
 # Evaluate the board state's fitness by averaging the fitness for movement in each
@@ -115,7 +142,6 @@ def evaluate_available_moves(board):
 
             scores[dir] = board_evaluator_in_dir(board.get_board(), dir) * empty_tile_factor
 
-
         else:
             scores.pop(dir)
 
@@ -128,14 +154,14 @@ def evaluate_available_moves(board):
 # Evaluates the fitness for making movement in given direction
 # By creating copies of rotated board, and then apply left_evaluator to the board
 # The function is able to cover evaluation in any direction
-def board_evaluator_in_dir(board, dir, row_weights = np.array([7,3,2,1])):
+def board_evaluator_in_dir(board, dir, row_weights = np.array([3,2,2,3])):
 
     if dir == settings.Direction.left:
         rotated_board = np.rot90(board,0)
     elif dir == settings.Direction.up:
-        rotated_board = np.rot90(board,1)
+        rotated_board = np.rot90(board,1)#transpose
     elif dir == settings.Direction.right:
-        rotated_board = np.rot90(board,2)
+        rotated_board = np.rot90(board,2)#
     elif dir == settings.Direction.down:
         rotated_board = np.rot90(board,3)
     else:
@@ -166,15 +192,12 @@ def board_left_evaluator(board, row_weights = np.array([1,1,1,1])):
 
 def left_row_evaluator(left_row,tiles_weights = np.array([3,2,1])):
 
-    left_row_copy = drop_zeros(left_row)
-
-
-
+    #left_row_copy = drop_zeros(left_row)
 
     score = 0
 
-    for n in range(0,left_row_copy.size - 1):
-        adjacent_tile_score = left_neibor_tiles_evaluator(left_row_copy[n], left_row_copy[n+1])
+    for n in range(0,left_row.size - 1):
+        adjacent_tile_score = left_neibor_tiles_evaluator(left_row[n], left_row[n+1])
         adjacent_tile_score *= tiles_weights[n]
         score += adjacent_tile_score
 
@@ -192,6 +215,7 @@ def drop_zeros(row_vector):
 
     return row_vector
 
+
 # NNN NNN -> Number
 # Treats the left_tile and right_tile as tiles on a row that is about
 # to be merged leftward.
@@ -206,7 +230,7 @@ def left_neibor_tiles_evaluator(left_tile,right_tile):
 
     left_right_diff = (normalize_tile_value(left_tile)- normalize_tile_value(right_tile))
     left_right_diff **= settings.TILE_DIFFERENCE_POWER
-    numerator = right_tile
+    numerator = left_tile + right_tile
 
 
     if left_bigger:
@@ -230,24 +254,26 @@ if __name__ == "__main__":
 
     bd = game.board.Board()
 
-    row = np.array([4,0,2,0])
-    print(left_row_evaluator(row))
-    print(row)
 
-    board = np.array([[0, 0, 0, 2],
+    board = np.array([[0, 0, 0, 0],
                       [0, 0, 0, 0],
-                      [0, 0, 2, 0],
-                      [0, 0, 8, 2]])
+                      [2, 0, 0, 0],
+                      [4, 4, 4, 0]])
 
     for row in range(0,4):
         bd.set_row(row,board[row,:])
 
+    rotboard = np.rot90(board,2)
+
+
     #move_board(bd.get_board(),settings.Direction.up)
     bd.print_board()
-    print(evaluate_board_state(bd))
+    #print(evaluate_board_state(bd))
     print(evaluate_available_moves(bd))
+    #print(deep_evaluate_board_state(bd))
+    print(board_left_evaluator(rotboard))
 
-    bd.print_board()
+    print(rotboard)
 
     """for n in range(0, 4):
         print("\n\n\n")
@@ -290,4 +316,3 @@ if __name__ == "__main_":
     print(evaluate_available_moves(bd))
 
     bd.print_board()
-

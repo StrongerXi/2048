@@ -75,12 +75,21 @@ class Board():
         for index in range(0,self.board_size):
             target_row[index] = input_row[index]
 
-    # Print out the board at console
-    def print_board(self):
+    # Board -> String
+    # Returns the state of the board as a string
+    def board_state_string(self):
+        bd_string = ""
+
         for row in self.__board:
             for col in row:
-                print(col, end = "   ")
-            print()
+                bd_string += str(col) + "   "
+            bd_string += "\n"
+
+        return bd_string
+
+    # Print out the board at console
+    def print_board(self):
+        print(self.board_state_string())
 
     # Board -> Boolean
     # Determine if the current board is movable in anydirection
@@ -165,6 +174,8 @@ class Board():
                          self.set_tile(r,c,settings.TILE_BASE_VALUE * 2)
 
                 random_index -= 1
+
+
 
     # Initialize the game board
     @staticmethod

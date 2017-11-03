@@ -2,7 +2,7 @@
 from game.game_state import GameState
 from game.movement import move_board
 import game.movement
-from AI.evaluation import board_evaluator_in_dir, evaluate_available_moves, find_optimized_move, evaluate_board_state
+from AI.evaluation import board_evaluator_in_dir, evaluate_available_moves, find_optimized_move, evaluate_board_state,deep_evaluate_board_state
 import numpy as np
 import settings
 
@@ -40,8 +40,13 @@ class Simulation:
 
     def evaluation_with_prediction_single_simulation(self):
 
+
+        data = open("data.txt",'a')
+
         self.gs.reset()
         self.gs.board.generate_random_tile()
+
+        data.write(self.gs.board.board_state_string())
 
         simFlag = True
 
@@ -52,11 +57,21 @@ class Simulation:
 
 
             moves_and_scores = self.evaluate_and_predict_optmized_move()
+
+            score = "score: " + str(self.gs.get_score()) + "\n"
+            data.write(score)
+            data.write(str(moves_and_scores))
+            data.write("\n\n")
+
             optimizedDir = find_optimized_move(moves_and_scores)
             round_score = move_board(self.gs.board.get_board(), optimizedDir)
 
             self.gs.board.generate_random_tile()
             self.gs.add_score(round_score)
+
+            data.write(self.gs.board.board_state_string())
+            state_fitness = "State fitness: " + str(evaluate_available_moves(self.gs.board.copy_board())) + "\n"
+            data.write(state_fitness)
 
 
             if not self.gs.board.check_board_moveable():
@@ -64,7 +79,7 @@ class Simulation:
 
 
 
-        print("Simulation has ended")
+        print("Simulation has ended, score is: ", self.gs.get_score())
 
 
         return self.gs.get_score()
@@ -85,8 +100,7 @@ class Simulation:
                   scores.pop(dir)
                   continue
 
-            copy_board.generate_random_tile()
-            board_state_score = evaluate_board_state(copy_board)
+            board_state_score = deep_evaluate_board_state(copy_board)
             scores[dir] = move_score + board_state_score
 
         return scores
