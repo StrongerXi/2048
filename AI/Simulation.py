@@ -127,7 +127,7 @@ class Simulation:
 
         while simFlag:
 
-            self.gs.board.print_board()
+            #self.gs.board.print_board()
             #print("score: ", self.gs.get_score(), "\n\n\n")
 
 
