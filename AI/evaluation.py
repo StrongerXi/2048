@@ -4,12 +4,18 @@ import math
 import settings
 import game
 from game.movement import move_board
+import game.movement
 import game.board
 
 
 # Ideas: for size = 4
 
-# TODO: #Testing for evaluation functions.
+# TODO: #There should be a penalty for rows such as [256,32,4,0], when the differences are too large
+        #Also, the constants need to be adjusted, and it is suggested that the programmer reads through several
+        #entire simulations to identify the reasons that keeps AI from scoring higher
+        #Random Simulation stopped moving even though the board is still moveable
+        #Need a more comprehensive way for the evaluate board/predict direction function.
+        # Maybe list out the possible states for prediction and calculate total fitness with expected individual state fitness
 
 # NoTE: The first two coefficients might be the dominant/easier to implement ones
 #       It's suggested to implement those first, and observe the simulator's performance.
@@ -36,14 +42,40 @@ import game.board
 # available direction
 def evaluate_board_state(board):
 
+
     available_moves = evaluate_available_moves(board)
-    total_score = 0
+    max_score = 0
     for key in available_moves:
-        total_score += available_moves[key]
+        max_score = max(max_score, available_moves[key])
 
-    average_score = total_score/len(available_moves)
+    if available_moves:
+        return max_score
+    else:
+        return -1 * sum_board_tiles(board)
 
-    return average_score
+"""
+    if available_moves:
+        average_score = total_score/board.board_size
+        return average_score
+    else:
+        return -1 * sum_board_tiles(board)"""
+
+
+# Board -> Number
+# Sums up all the tiles of given Board
+# This negative of this sum will be used as the penalty for a dead state
+def sum_board_tiles(board):
+
+    copy_board_state = board.get_board()
+    sum = 0
+
+    for r in range(0,len(copy_board_state[:,0])):
+
+        for c in range(0,len(copy_board_state[0,:])):
+
+            sum += copy_board_state[r,c]
+
+    return sum
 
 
 # Dict-of (Direction : Number)
@@ -59,6 +91,10 @@ def find_optimized_move(available_moves_scores):
     return max_dir
 
 
+# Board -> Dict-of (Direction : Number)
+# Simulate
+
+
 
 # Board -> Dict-of (setting.Direction : Number)
 # This function returns the available direction of movement and their fitness in a dictionary
@@ -70,19 +106,29 @@ def evaluate_available_moves(board):
               settings.Direction.down: 0}
 
     for dir in settings.Direction:
-        move_board(board.copy_board(),dir)
-        if not game.movement.moved:
-              scores.pop(dir)
-        else: scores[dir] = board_evaluator_in_dir(board.get_board(),dir)
+        copy_board = board.copy_board()
+        move_board(copy_board.get_board(),dir)
+
+        if game.movement.moved == True:
+            total_tiles = board.get_board().size
+            empty_tile_factor = board.get_empty_count()/total_tiles
+
+            scores[dir] = board_evaluator_in_dir(board.get_board(), dir) * empty_tile_factor
+
+
+        else:
+            scores.pop(dir)
 
     return scores
+
+
 
 
 # np.Array Direction np.Array -> Number
 # Evaluates the fitness for making movement in given direction
 # By creating copies of rotated board, and then apply left_evaluator to the board
 # The function is able to cover evaluation in any direction
-def board_evaluator_in_dir(board, dir, row_weights = np.array([2,1,1,2])):
+def board_evaluator_in_dir(board, dir, row_weights = np.array([7,3,2,1])):
 
     if dir == settings.Direction.left:
         rotated_board = np.rot90(board,0)
@@ -120,15 +166,31 @@ def board_left_evaluator(board, row_weights = np.array([1,1,1,1])):
 
 def left_row_evaluator(left_row,tiles_weights = np.array([3,2,1])):
 
+    left_row_copy = drop_zeros(left_row)
+
+
+
+
     score = 0
 
-    for n in range(0,left_row.size - 1):
-        adjacent_tile_score = left_neibor_tiles_evaluator(left_row[n], left_row[n+1])
+    for n in range(0,left_row_copy.size - 1):
+        adjacent_tile_score = left_neibor_tiles_evaluator(left_row_copy[n], left_row_copy[n+1])
         adjacent_tile_score *= tiles_weights[n]
         score += adjacent_tile_score
 
     return score
 
+# np.Array -> np.Array
+# Drop all the zeros in given row vector/np.array
+def drop_zeros(row_vector):
+    zero_indexes = []
+    for index in range(0,row_vector.size):
+        if row_vector[index] == 0:
+            zero_indexes.append(index)
+
+    row_vector = np.delete(row_vector,zero_indexes)
+
+    return row_vector
 
 # NNN NNN -> Number
 # Treats the left_tile and right_tile as tiles on a row that is about
@@ -168,15 +230,24 @@ if __name__ == "__main__":
 
     bd = game.board.Board()
 
-    board = np.array([[4, 16, 8, 32],
-                      [32, 32, 8, 8],
-                      [64, 32, 16, 32],
-                      [128, 64, 128, 32]])
+    row = np.array([4,0,2,0])
+    print(left_row_evaluator(row))
+    print(row)
+
+    board = np.array([[0, 0, 0, 2],
+                      [0, 0, 0, 0],
+                      [0, 0, 2, 0],
+                      [0, 0, 8, 2]])
 
     for row in range(0,4):
         bd.set_row(row,board[row,:])
 
+    #move_board(bd.get_board(),settings.Direction.up)
+    bd.print_board()
     print(evaluate_board_state(bd))
+    print(evaluate_available_moves(bd))
+
+    bd.print_board()
 
     """for n in range(0, 4):
         print("\n\n\n")
@@ -208,3 +279,15 @@ if __name__ == "__main__":
         left *= 2
 
     print("over")"""
+
+
+if __name__ == "__main_":
+
+    bd = game.board.Board()
+    bd.generate_random_tile()
+    bd.print_board()
+
+    print(evaluate_available_moves(bd))
+
+    bd.print_board()
+

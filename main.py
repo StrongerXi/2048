@@ -12,4 +12,4 @@ from AI.Simulation import Simulation
 
 sim = Simulation()
 
-sim.evaluation_with_prediction_simulator(10)
+sim.random_simulator(100)

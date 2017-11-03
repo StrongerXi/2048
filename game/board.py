@@ -22,6 +22,7 @@ class Board():
         self.__board = np.array(Board.initialize_board(self.board_size))
 
 
+
     # Board Int Int -> Int/Boolean
     # Return the value of the tile at specified location
     # If given location is out of bounds, return False
@@ -44,7 +45,8 @@ class Board():
         return self.__board[:, col]
 
     def get_board(self):
-        return np.copy(self.__board)
+        return self.__board
+
 
     # Board -> np.array
     # returns a copy of the game board
@@ -175,3 +177,19 @@ class Board():
                 r.append(0)
             board.append(r)
         return board
+
+
+if __name__ == "__main__":
+    bd = Board()
+
+    x = np.array([[2,16,32,128],
+                  [2,8,16,4],
+                  [2,4,2,16],
+                  [4,2,4,8]])
+
+    for r in range(0,len(x[0,:])):
+        bd.set_row(r,x[r])
+
+    bd.print_board()
+
+    print(bd.check_board_moveable())

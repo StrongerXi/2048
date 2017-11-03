@@ -1,5 +1,6 @@
 import random
 import settings
+import game.board
 # This Class Involves the following:
 # - Direction Enum for moving the board
 # - Move board in any Direction
@@ -64,13 +65,13 @@ def move_up(board):
 
     score = 0
 
-    size = board.board_size
+    size = len(board[:,0])
 
     for c in range(0,size):
 
         # Collects each coloumn as a [c0,c1,c2....] array,
         # then move it leftwards(effectively same as moving upward with a column vector)
-        this_col = board.get_col(c)
+        this_col = board[:,c]
         # Add the score attained from this single column move to total score
         score += move_like_leftrow(this_col)
 
@@ -85,13 +86,13 @@ def move_down(board):
     score = 0
 
 
-    size = board.board_size
+    size = len(board[:,0])
 
     for c in range(0, size):
         # Collects each coloumn as a [c0,c1,c2....] array,
         # then reverses it, moves reversed array rightward, then reverse it again
         # (effectively same as moving upward with a column vector)
-        this_col = board.get_col(c)
+        this_col = board[:,c]
         reversed_col = this_col[::-1] # First reverse
         # Add the score attained from this single column move to total score
         score += move_like_leftrow(reversed_col)
@@ -106,13 +107,12 @@ def move_down(board):
 def move_left(board):
     score = 0
 
-
-    size = board.board_size
+    size = len(board[0,:])
 
     for r in range(0, size):
         # Collects each row as a [c0,c1,c2....] array,\
         # then move it leftward
-        this_row = board.get_row(r)
+        this_row = board[r,:]
         # Add the score attained from this single column move to total score
         score += move_like_leftrow(this_row)
 
@@ -123,12 +123,12 @@ def move_left(board):
 # any merged tiles
 def move_right(board):
     score = 0
-    size = board.board_size
+    size = len(board[0,:])
 
     for r in range(0, size):
         # Collects each row as a [c0,c1,c2....] array,
         # then reverses it, and moves the reversed array.
-        this_row = board.get_row(r)
+        this_row = board[r,:]
         reversed_col = this_row[::-1] # First reverse
         # Add the score attained from this single column move to total score
         score += move_like_leftrow(reversed_col)
@@ -147,6 +147,7 @@ def move_like_leftrow(pseudo_row):
     move_left_without_merge(pseudo_row)
 
     return score
+
 
 
 # List -> List
@@ -201,3 +202,15 @@ def merge_left_row(pseudo_row):
         else: index += 1
 
     return score
+
+
+if __name__ == "__main__":
+    bd = game.board.Board()
+    bd.generate_random_tile()
+
+    bd.print_board()
+
+    move_board(bd.get_board(),settings.Direction.right)
+    bd.generate_random_tile()
+
+    bd.print_board()

@@ -13,8 +13,10 @@ import settings
 
 class GameRunner():
 
-    def __init__(self):
-        self.gs = GameState(settings.BOARD_DEFAULT_SIZE)
+    def __init__(self,gamestate = GameState(settings.BOARD_DEFAULT_SIZE)):
+
+        self.gs = gamestate
+
         self.board = self.gs.board
 
 
@@ -29,7 +31,7 @@ class GameRunner():
             dir = input("please enter 'w' for up, 's' for down, 'a' for left, and 'd' for right, anything else for exit game\n")
             ipt = get_movement(dir)
 
-            round_score = move_board(self.board, ipt)
+            round_score = move_board(self.board.get_board(), ipt)
 
             if game.movement.moved:
                 self.board.generate_random_tile()
@@ -59,6 +61,11 @@ def get_movement(dir):
     return "exit"
 
 
+
+if __name__ == "__main__":
+
+    runner = GameRunner()
+    runner.run()
 
 
 
