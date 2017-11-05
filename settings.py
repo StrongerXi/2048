@@ -9,6 +9,7 @@ TILE_TWO_PROBABILITY = 0.9
 TILE_BASE_VALUE = 2
 
 
+
 # Direction Enums
 class Direction(Enum):
 
@@ -26,3 +27,7 @@ DEAD_BOARD_PENALTY = -1000
 
 # Evaluator Function Constants
 TILE_DIFFERENCE_POWER = 2
+TILE_DIFFERENCE_TOLERANCE = 1 ** TILE_DIFFERENCE_POWER
+#INTERPRETATION -> DIFFERENCE_TOLERANCE determines the maximum tile difference in terms of log(base_value) raised to diff_power
+# that still allows fitness to be positive
+# Ex: if tolerance = 3, base value =2,  (16,2), (128,16) would be those edge cases.

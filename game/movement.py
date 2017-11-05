@@ -5,16 +5,10 @@ import game.board
 # - Direction Enum for moving the board
 # - Move board in any Direction
 # - Helper functions that move/merge row/column
-# - A global boolean variable moved that helps game_runner
-#   determine whether an attempted movement has been effective
 
 # Note:
 #       - The functions in this module must take in a Board Class
 #       - The tests.movement_test module might give some insights to the mechanism of moving.
-
-
-
-moved = True
 
 
 
@@ -37,9 +31,6 @@ def get_random_direction():
 #  The move_board function returns the merging score based on rules of the game
 #  If movement in a direction is ineffective, move_board returns 0
 def move_board(board , dir):
-
-    global moved
-    moved = False
 
     score = 0
 
@@ -166,8 +157,6 @@ def move_left_without_merge(pseudo_row):
             if pseudo_row[candidate] != 0:
                 pseudo_row[index] = pseudo_row[candidate]
                 pseudo_row[candidate] = 0
-                global moved
-                moved = True
 
                 break
 
@@ -194,9 +183,6 @@ def merge_left_row(pseudo_row):
             pseudo_row[index-1] *= 2
             pseudo_row[index] = 0
             score += pseudo_row[index-1]
-
-            global moved
-            moved = True
 
             index += 2
         else: index += 1

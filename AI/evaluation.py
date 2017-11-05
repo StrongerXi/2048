@@ -36,10 +36,41 @@ import game.board
 
 
 
-# In the move functions, still calculate the raw score obtained from combining tiles
+# All Functions in this module can take in the Board Object directly.
+# A copy would be made within these functions, to ensure that no change would occur
+# in the original board being passed in
+
+
+# First simulate movement into each direction, then evaluates the board for the board state after
+# each directional movement.
+# The fitness score of the board state represents the score for each direction.
+def evaluate_and_predict_optmized_move(board):
+    scores = {settings.Direction.up: 0, settings.Direction.right: 0, settings.Direction.left: 0,
+              settings.Direction.down: 0}
+
+
+    for dir in settings.Direction:
+
+        copy_board = board.copy_board()
+
+        if board.check_board_moveable_in_dir(dir):
+
+            move_score = move_board(copy_board.get_board(), dir)
+
+            board_state_score = deep_evaluate_board_state(copy_board)
+
+            scores[dir] = move_score + board_state_score
+
+        else:
+            scores.pop(dir)
+
+    return scores
 
 
 def deep_evaluate_board_state(board):
+
+    if board.get_empty_count() == 0:
+        return evaluate_board_state(board)
 
     all_possible_state_scores = np.array([],np.int32)
 
@@ -64,13 +95,16 @@ def deep_evaluate_board_state(board):
     return np.median(all_possible_state_scores)
 
 
+
 # Board -> Number
 # Evaluate the board state's fitness by averaging the fitness for movement in each
 # available direction
 def evaluate_board_state(board):
 
+    board_copy = board.copy_board()
+    board = None
 
-    available_moves = evaluate_available_moves(board)
+    available_moves = evaluate_available_moves(board_copy)
     max_score = 0
     for key in available_moves:
         max_score = max(max_score, available_moves[key])
@@ -78,7 +112,7 @@ def evaluate_board_state(board):
     if available_moves:
         return max_score
     else:
-        return -1 * sum_board_tiles(board)
+        return -1 * sum_board_tiles(board_copy)
 
 """
     if available_moves:
@@ -133,17 +167,13 @@ def evaluate_available_moves(board):
               settings.Direction.down: 0}
 
     for dir in settings.Direction:
-        copy_board = board.copy_board()
-        move_board(copy_board.get_board(),dir)
 
-        if game.movement.moved == True:
+        if board.check_board_moveable_in_dir(dir):
             total_tiles = board.get_board().size
-            empty_tile_factor = board.get_empty_count()/total_tiles
-
+            empty_tile_factor = board.get_empty_count()+1/total_tiles
             scores[dir] = board_evaluator_in_dir(board.get_board(), dir) * empty_tile_factor
 
-        else:
-            scores.pop(dir)
+        else: scores.pop(dir)
 
     return scores
 
@@ -167,6 +197,7 @@ def board_evaluator_in_dir(board, dir, row_weights = np.array([3,2,2,3])):
     else:
         raise Exception("Wrong direction input for board_evaluator_in_dir: ",dir, type(dir))
 
+
     return board_left_evaluator(rotated_board,row_weights)
 
 # np.Array np.Array  -> Number
@@ -178,7 +209,10 @@ def board_left_evaluator(board, row_weights = np.array([1,1,1,1])):
 
     for n in range(0,board[:,0].size):
         row_score = left_row_evaluator(board[n])
+        #print(row_score)
+
         row_score *= row_weights[n]
+
         score += row_score
 
     return score
@@ -192,7 +226,7 @@ def board_left_evaluator(board, row_weights = np.array([1,1,1,1])):
 
 def left_row_evaluator(left_row,tiles_weights = np.array([3,2,1])):
 
-    #left_row_copy = drop_zeros(left_row)
+    #left_row = drop_zeros(left_row)
 
     score = 0
 
@@ -230,13 +264,14 @@ def left_neibor_tiles_evaluator(left_tile,right_tile):
 
     left_right_diff = (normalize_tile_value(left_tile)- normalize_tile_value(right_tile))
     left_right_diff **= settings.TILE_DIFFERENCE_POWER
-    numerator = left_tile + right_tile
+    coef = left_tile + right_tile
+    diff_tolerance = settings.TILE_DIFFERENCE_TOLERANCE
 
 
     if left_bigger:
-        return numerator / (1 + left_right_diff)
+        return coef * (diff_tolerance - left_right_diff)
     else:
-        return numerator / (1 + abs(left_right_diff)) - right_tile
+        return -1 * coef * (diff_tolerance - abs(left_right_diff))
 
 
 # Number -> Number

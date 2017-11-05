@@ -2,7 +2,7 @@
 from game.game_state import GameState
 from game.movement import move_board
 import game.movement
-from AI.evaluation import board_evaluator_in_dir, evaluate_available_moves, find_optimized_move, evaluate_board_state,deep_evaluate_board_state
+from AI import evaluation
 import numpy as np
 import settings
 
@@ -48,7 +48,7 @@ class Simulation:
 
         data.write(self.gs.board.board_state_string())
 
-        simFlag = True
+        simFlag = self.gs.board.check_board_moveable()
 
         while simFlag:
 
@@ -56,21 +56,21 @@ class Simulation:
             #print("score: ", self.gs.get_score(), "\n\n\n")
 
 
-            moves_and_scores = self.evaluate_and_predict_optmized_move()
+            moves_and_scores = evaluation.evaluate_and_predict_optmized_move(self.gs.board)
 
             score = "score: " + str(self.gs.get_score()) + "\n"
             data.write(score)
             data.write(str(moves_and_scores))
             data.write("\n\n")
 
-            optimizedDir = find_optimized_move(moves_and_scores)
+            optimizedDir = evaluation.find_optimized_move(moves_and_scores)
             round_score = move_board(self.gs.board.get_board(), optimizedDir)
 
             self.gs.board.generate_random_tile()
             self.gs.add_score(round_score)
 
             data.write(self.gs.board.board_state_string())
-            state_fitness = "State fitness: " + str(evaluate_available_moves(self.gs.board.copy_board())) + "\n"
+            state_fitness = "State fitness: " + str(evaluation.evaluate_available_moves(self.gs.board.copy_board())) + "\n"
             data.write(state_fitness)
 
 
@@ -85,25 +85,6 @@ class Simulation:
         return self.gs.get_score()
 
 
-    # First simulate movement into each direction, then evaluates the board for the board state after
-    # each directional movement.
-    # The fitness score of the board state represents the score for each direction.
-    def evaluate_and_predict_optmized_move(self):
-
-        scores = {settings.Direction.up: 0, settings.Direction.right: 0, settings.Direction.left: 0,
-                  settings.Direction.down: 0}
-
-        for dir in settings.Direction:
-            copy_board = self.gs.board.copy_board()
-            move_score = move_board(copy_board.get_board(),dir)
-            if not game.movement.moved:
-                  scores.pop(dir)
-                  continue
-
-            board_state_score = deep_evaluate_board_state(copy_board)
-            scores[dir] = move_score + board_state_score
-
-        return scores
 
 
 
@@ -145,9 +126,9 @@ class Simulation:
             #print("score: ", self.gs.get_score(), "\n\n\n")
 
 
-            moves_score = evaluate_available_moves(self.gs.board.copy_board())
+            moves_score = evaluation.evaluate_available_moves(self.gs.board.copy_board())
             print(moves_score)
-            optimizedDir = find_optimized_move(moves_score)
+            optimizedDir = evaluation.find_optimized_move(moves_score)
             round_score = move_board(self.gs.board.get_board(), optimizedDir)
 
             self.gs.board.generate_random_tile()
@@ -260,22 +241,25 @@ class Simulation:
 
         board = self.gs.board.copy_board()
 
-        total_score = move_board(board.get_board(),dir)
-        if not game.movement.moved:
-            return (total_score + settings.DEAD_BOARD_PENALTY)
-        if game.movement.moved:
+
+        if board.check_board_moveable_in_dir(dir):
+            total_score = move_board(board.get_board(),dir)
             board.generate_random_tile()
+
+        else:
+            return settings.DEAD_BOARD_PENALTY
+
 
         for n in range(0,totalSims):
 
             tempboard = board.copy_board()
 
             for steps in range(1,numberOfSteps):
-                total_score += move_board(tempboard.get_board(),dir)
-                if not board.check_board_moveable():
+                if board.check_board_moveable_in_dir(dir):
+                    total_score += move_board(tempboard.get_board(), dir)
+                    tempboard.generate_random_tile()
+                else:
                     total_score += settings.DEAD_BOARD_PENALTY
-                if game.movement.moved:
-                    board.generate_random_tile()
 
         return total_score
 
@@ -304,7 +288,7 @@ if __name__ == "__main__":
 
 
     moves_and_scores = sim.evaluate_and_predict_optmized_move()
-    optimizedDir = find_optimized_move(moves_and_scores)
+    optimizedDir = evaluation.find_optimized_move(moves_and_scores)
     round_score = move_board(sim.gs.board.get_board(), optimizedDir)
     print("score:", moves_and_scores)
 

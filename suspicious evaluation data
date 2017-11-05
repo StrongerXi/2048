@@ -1,0 +1,29 @@
+
+current score:  8
+4   2   0   0
+4   2   0   0
+0   0   0   0
+0   0   0   0
+
+
+ predict optimized move:  {<Direction.up: '__up__'>: 732.26625000000013, <Direction.right: '__right__'>: 1001.3775000000001, <Direction.down: '__down__'>: 732.26625000000013}
+
+ available moves {<Direction.up: '__up__'>: 1264.1500000000001, <Direction.right: '__right__'>: -180.9375, <Direction.down: '__down__'>: 106.14999999999999}
+
+
+
+
+current score:  40
+8   8   2   4
+4   2   0   0
+0   0   0   0
+0   0   0   0
+
+
+ predict optimized move:  {<Direction.right: '__right__'>: 339.88227941176467, <Direction.left: '__left__'>: 732.0474999999999, <Direction.down: '__down__'>: 1309.7125000000001}
+
+ available moves {<Direction.right: '__right__'>: 332.0625, <Direction.left: '__left__'>: 1760.9375, <Direction.down: '__down__'>: -531.30000000000007}
+
+Left in the available move here should be a really bad score, because of the '8,2,4' sequence.
+
+The function must drop quicker.

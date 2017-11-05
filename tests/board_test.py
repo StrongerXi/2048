@@ -1,6 +1,9 @@
-import unittest
 
+import unittest
+from settings import Direction
 from game.board import Board
+
+
 
 class BoardTest(unittest.TestCase):
 
@@ -16,6 +19,18 @@ class BoardTest(unittest.TestCase):
 
         self.board.set_row(3, [5, 6, 7, 8])
 
+
+    def test_check_board_moveable_in_dir(self):
+
+        self.board.set_row(0,[0,6,3,4])
+
+        self.assertEqual(self.board.check_board_moveable_in_dir(Direction.up), True)
+
+        self.assertEqual(self.board.check_board_moveable_in_dir(Direction.down), True)
+
+        self.assertEqual(self.board.check_board_moveable_in_dir(Direction.right), False)
+
+        self.assertEqual(self.board.check_board_moveable_in_dir(Direction.left), True)
 
     def test_check_board_moveable(self):
 

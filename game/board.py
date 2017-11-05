@@ -5,21 +5,25 @@ import random
 
 # This Board Class involves the following:
 # -- initialization of Board with optional size given at Board(size)
-# -- get and set row/column/tile
+# -- get and set row/column/tile/board_array
 # -- Print out the Board state at Console
 # -- Check whether board/tile is moveable at all in any direction
 # -- Get the number of empty tiles on board
+# -- Check whether the board is moveable in given direction
 
 # Note: Empty Tile is represented as 0
 #       All Non-empty Tiles should have positive integer value
 
 class Board():
 
-    def __init__(self,boardsize = settings.BOARD_DEFAULT_SIZE):
+    def __init__(self,boardsize = settings.BOARD_DEFAULT_SIZE, board = None):
 
         self.board_size = boardsize
+        if board is None:
+            self.__board = np.array(Board.initialize_board(self.board_size))
+        else:
+            self.__board = board
 
-        self.__board = np.array(Board.initialize_board(self.board_size))
 
 
 
@@ -75,6 +79,13 @@ class Board():
         for index in range(0,self.board_size):
             target_row[index] = input_row[index]
 
+    # Board np.Array -> _:
+    def set_board(self,board_array):
+
+        for index in range(0,len(self.get_board()[:,0])):
+            self.set_row(index,board_array[index])
+
+
     # Board -> String
     # Returns the state of the board as a string
     def board_state_string(self):
@@ -95,6 +106,8 @@ class Board():
     # Determine if the current board is movable in anydirection
     # if not, return False
     def check_board_moveable(self):
+        if self.get_empty_count() != 0:
+            return True
 
         for r in range(0,self.board_size):
 
@@ -112,9 +125,6 @@ class Board():
     # that are adjacent to it.
     # If not, return False
     def check_tile_moveable(self,row,col):
-
-        if self.get_empty_count() != 0:
-            return True
 
         target_tile = self.get_tile(row,col)
         for n in range(-1,2,2):
@@ -176,6 +186,64 @@ class Board():
                 random_index -= 1
 
 
+    # Board setting.Direction-> Boolean
+    # Checks whether the board is moveable in particular direction
+    # If yes, returns True
+    # It rotates the board accordingly and applies check-moveable-left to the rotated board
+    def check_board_moveable_in_dir(self,dir):
+
+        if dir == settings.Direction.left:
+            rotated_board = np.rot90(self.get_board(), 0)
+        elif dir == settings.Direction.up:
+            rotated_board = np.rot90(self.get_board(), 1)  # transpose
+        elif dir == settings.Direction.right:
+            rotated_board = np.rot90(self.get_board(), 2)  #
+        elif dir == settings.Direction.down:
+            rotated_board = np.rot90(self.get_board(), 3)
+        else:
+            return False
+
+        return Board.check_board_moveable_in_left(rotated_board)
+
+    # np.Array -> Boolean
+    # check whether the board is moveable towards the left
+    # returns True if it's moveable
+    @staticmethod
+    def check_board_moveable_in_left(board_array):
+
+
+        for row in board_array:
+            if Board.check_row_moveable_in_left(row):
+                return True
+
+
+        return False
+
+    # Row -> Boolean
+    # Check whether the given row is moveable towards the left
+    @staticmethod
+    def check_row_moveable_in_left(row):
+
+        pivot_tile = row[0]
+        has_zero = pivot_tile == 0
+        zero_in_between = False
+
+        for index in range(1, row.size):
+            current_tile = row[index]
+
+            if current_tile == 0:
+                has_zero = True
+                continue
+            if current_tile == pivot_tile:
+                return True
+
+            if has_zero: # This point indicates that current tile is non zero, and differs from pivot
+                zero_in_between = True
+            pivot_tile = current_tile
+
+        return zero_in_between
+
+
 
     # Initialize the game board
     @staticmethod
@@ -193,14 +261,15 @@ class Board():
 if __name__ == "__main__":
     bd = Board()
 
-    x = np.array([[2,16,32,128],
+    x = np.array([[0,16,4,2],
                   [2,8,16,4],
-                  [2,4,2,16],
+                  [8,4,2,16],
                   [4,2,4,8]])
 
-    for r in range(0,len(x[0,:])):
-        bd.set_row(r,x[r])
+    bd.set_board(x)
 
     bd.print_board()
 
-    print(bd.check_board_moveable())
+    for dir in settings.Direction:
+        print(dir, bd.check_board_moveable_in_dir(dir))
+

@@ -23,14 +23,3 @@ class GameState:
     def reset(self):
         self.__init__()
 
-
-
-gs = GameState()
-
-gs.board.set_tile(2,2,2)
-
-gs.board.print_board()
-
-gs.reset()
-
-gs.board.print_board()

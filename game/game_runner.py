@@ -1,7 +1,8 @@
 from game.game_state import GameState
 from game.movement import move_board
-import game.movement
 import settings
+from AI import evaluation
+
 
 #TODO:
 # 1. The game_runner uses the moved global variable from movement module
@@ -28,14 +29,16 @@ class GameRunner():
 
             print("\n\ncurrent score: ", self.gs.get_score())
             self.board.print_board()
-            dir = input("please enter 'w' for up, 's' for down, 'a' for left, and 'd' for right, anything else for exit game\n")
+            print("\n predict optimized move: ", evaluation.evaluate_and_predict_optmized_move(self.board))
+            print("\n available moves",evaluation.evaluate_available_moves(self.board))
+
+            dir = input("\nplease enter 'w' for up, 's' for down, 'a' for left, and 'd' for right, anything else for exit game\n")
             ipt = get_movement(dir)
 
-            round_score = move_board(self.board.get_board(), ipt)
-
-            if game.movement.moved:
+            if self.board.check_board_moveable_in_dir(ipt):
+                round_score = move_board(self.board.get_board(), ipt)
                 self.board.generate_random_tile()
-            self.gs.add_score(round_score)
+                self.gs.add_score(round_score)
 
 
         if ipt != "exit":
