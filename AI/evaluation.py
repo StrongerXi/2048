@@ -2,9 +2,7 @@ import settings
 import numpy as np
 import math
 import settings
-import game
 from game.movement import move_board
-import game.movement
 import game.board
 
 
@@ -41,12 +39,17 @@ import game.board
 # in the original board being passed in
 
 
+# Board Number -> Dict-(Direction : Number)
+# Input number represents the depth of steps for simulation
 # First simulate movement into each direction, then evaluates the board for the board state after
 # each directional movement.
 # The fitness score of the board state represents the score for each direction.
-def evaluate_and_predict_optmized_move(board):
+
+def evaluate_and_predict_optmized_move(board,steps = 2):
+
     scores = {settings.Direction.up: 0, settings.Direction.right: 0, settings.Direction.left: 0,
               settings.Direction.down: 0}
+
 
 
     for dir in settings.Direction:
@@ -57,7 +60,7 @@ def evaluate_and_predict_optmized_move(board):
 
             move_score = move_board(copy_board.get_board(), dir)
 
-            board_state_score = deep_evaluate_board_state(copy_board)
+            board_state_score = deep_evaluate_board_state(copy_board,steps)
 
             scores[dir] = move_score + board_state_score
 
@@ -67,10 +70,18 @@ def evaluate_and_predict_optmized_move(board):
     return scores
 
 
-def deep_evaluate_board_state(board):
 
-    if board.get_empty_count() == 0:
-        return evaluate_board_state(board)
+# Board Number -> Number
+# Returns the expected state fitness after having moved a board
+# The function generates each possible state by creating 2 and 4 tiles at each empty tile respectively
+# and evaluate each one of them.
+
+def deep_evaluate_board_state(board, steps=0):
+
+    if not board.check_board_moveable():
+        return settings.DEAD_BOARD_PENALTY
+
+# Past this point, meaning the board is moveable in at least one Direction
 
     all_possible_state_scores = np.array([],np.int32)
 
@@ -81,16 +92,28 @@ def deep_evaluate_board_state(board):
             if board.get_tile(row,col) == 0:
                 state_score = 0
                 pop_base_tile_board = board.copy_board()
-
                 pop_base_tile_board.set_tile(row,col,settings.TILE_BASE_VALUE)
-                state_score += settings.TILE_TWO_PROBABILITY * evaluate_board_state(pop_base_tile_board)
 
                 pop_double_base_tile_board = board.copy_board()
-
                 pop_double_base_tile_board.set_tile(row, col, 2*settings.TILE_BASE_VALUE)
-                state_score += (1 - settings.TILE_TWO_PROBABILITY) * evaluate_board_state(pop_double_base_tile_board)
+
+                if steps == 0:
+                    state_score += settings.TILE_TWO_PROBABILITY * board_evaluation_function(pop_base_tile_board)
+                    state_score += (1 - settings.TILE_TWO_PROBABILITY) * board_evaluation_function(pop_double_base_tile_board)
+
+                elif steps > 0:
+                    tile_two_deeper_moves_and_scores = evaluate_and_predict_optmized_move(pop_base_tile_board,steps - 1)
+                    tile_four_deeper_moves_and_scores = evaluate_and_predict_optmized_move(pop_double_base_tile_board,
+                                                                                            steps - 1)
+                    tile_two_score = get_highest_score(tile_two_deeper_moves_and_scores)
+                    tile_four_score = get_highest_score(tile_four_deeper_moves_and_scores)
+
+                    state_score += tile_two_score + tile_four_score
+                else:
+                    raise Exception("Steps smaller than zero exeption!")
 
                 all_possible_state_scores = np.append(all_possible_state_scores,state_score)
+
 
     return np.median(all_possible_state_scores)
 
@@ -139,7 +162,7 @@ def sum_board_tiles(board):
     return sum
 
 
-# Dict-of (Direction : Number)
+# Dict-of (Direction : Number) -> Direction
 # Find the optimized moves in the given available moves and their evaluation scores
 def find_optimized_move(available_moves_scores):
 
@@ -152,8 +175,21 @@ def find_optimized_move(available_moves_scores):
     return max_dir
 
 
-# Board -> Dict-of (Direction : Number)
-# Simulate
+# Dict-of (Direction : Number) -> Number
+# Finds the maximum score in given available_moves_scores
+
+def get_highest_score(available_moves_scores):
+
+    if not available_moves_scores:
+        return settings.DEAD_BOARD_PENALTY
+
+    max_score = 0
+    for dir in available_moves_scores.keys():
+        if available_moves_scores[dir] > max_score:
+            max_score = available_moves_scores[dir]
+
+    return max_score
+
 
 
 
@@ -179,6 +215,30 @@ def evaluate_available_moves(board):
 
 
 
+# Board -> Number
+# Evaluate the Board's fitness by:
+# 1. Normalize the board value into the power they are raised to(ex. 16 with base 2 would be 4, 8 would be 3...)
+# 2. Multiply them with the preset TILE_WEIGHT_MATRIX in settings.py
+# 3. Return the sum of the resulted matrix's elements.
+
+def board_evaluation_function(board):
+
+
+    board_matrix = np.copy(board.get_board())
+
+    for row in range(0,len(board_matrix[:,0])):
+
+        for col in range(0,len(board_matrix[0,:])):
+
+            board_matrix[row,col] = normalize_tile_value(board_matrix[row,col])
+
+    multiplied_matrix = np.multiply(board_matrix, settings.TILE_WEIGHT_MATRIX)
+
+    empty_count_factor = (board.get_empty_count() + 1)/ board.get_board().size
+
+
+
+    return np.sum(multiplied_matrix)  * empty_count_factor
 
 # np.Array Direction np.Array -> Number
 # Evaluates the fitness for making movement in given direction

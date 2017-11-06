@@ -51,12 +51,12 @@ class Simulation:
         simFlag = self.gs.board.check_board_moveable()
 
         while simFlag:
-
+            #print("simulating")
             #self.gs.board.print_board()
             #print("score: ", self.gs.get_score(), "\n\n\n")
 
+            moves_and_scores = evaluation.evaluate_and_predict_optmized_move(self.gs.board,0)
 
-            moves_and_scores = evaluation.evaluate_and_predict_optmized_move(self.gs.board)
 
             score = "score: " + str(self.gs.get_score()) + "\n"
             data.write(score)

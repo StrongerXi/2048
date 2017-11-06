@@ -14,18 +14,24 @@ class Evaluation_test(unittest.TestCase):
                            [4, 2, 0, 0],
                            [0, 0, 0, 0],
                            [0, 0, 0, 0]])
-        self.board2 = np.array([[4, 4, 4, 4],
-                           [4, 4, 8, 16],
-                           [64, 8, 16, 32],
-                           [128, 128, 64, 64]])
-        self.board3 = np.array([[16, 8, 8, 4],
-                           [32, 16, 8, 4],
-                           [64, 32, 16, 4],
-                           [128, 64, 32, 0]])
+        self.board2 = np.array([[0, 64, 8, 4],
+                           [0, 0, 0, 4],
+                           [0, 4, 0, 4],
+                           [0, 0, 0, 4]])
+        self.board3 = np.array([[64, 8, 4, 0],
+                           [4, 0, 0, 0],
+                           [4, 0, 0, 0],
+                           [2, 0, 2, 0]])
+
+        self.board4 = np.array([[128, 64, 32, 16],
+                                [32, 32, 32, 4],
+                                [64, 32, 16, 4],
+                                [32, 32, 32, 0]])
 
         self.boards = [Board(board=self.board1),
                        Board(board=self.board2),
-                       Board(board=self.board3)]
+                       Board(board=self.board3),
+                       Board(board=self.board4)]
 
 
 
@@ -36,7 +42,7 @@ class Evaluation_test(unittest.TestCase):
             print(AI.evaluation.evaluate_available_moves(board))
             print("\n\n")
 
-    def test_deep_evaluate_board_state(self):
+    def est_deep_evaluate_board_state(self):
 
         for board in self.boards:
             board.print_board()
@@ -48,6 +54,14 @@ class Evaluation_test(unittest.TestCase):
         test_board.print_board()
 
         print(AI.evaluation.board_evaluator_in_dir(test_board.get_board(),settings.Direction.down))
+
+    def test_board_evaluation_function(self):
+
+        for board in self.boards:
+            board.print_board()
+            print(AI.evaluation.board_evaluation_function(board))
+            print("\n\n")
+
 
 
 

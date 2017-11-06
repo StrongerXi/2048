@@ -266,6 +266,10 @@ if __name__ == "__main__":
                   [8,4,2,16],
                   [4,2,4,8]])
 
+
+
+
+
     bd.set_board(x)
 
     bd.print_board()
