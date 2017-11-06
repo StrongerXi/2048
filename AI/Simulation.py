@@ -55,7 +55,7 @@ class Simulation:
             #self.gs.board.print_board()
             #print("score: ", self.gs.get_score(), "\n\n\n")
 
-            moves_and_scores = evaluation.evaluate_and_predict_optmized_move(self.gs.board,0)
+            moves_and_scores = evaluation.evaluate_and_predict_optmized_move(self.gs.board,1)
 
 
             score = "score: " + str(self.gs.get_score()) + "\n"
@@ -70,8 +70,6 @@ class Simulation:
             self.gs.add_score(round_score)
 
             data.write(self.gs.board.board_state_string())
-            state_fitness = "State fitness: " + str(evaluation.evaluate_available_moves(self.gs.board.copy_board())) + "\n"
-            data.write(state_fitness)
 
 
             if not self.gs.board.check_board_moveable():
