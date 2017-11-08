@@ -6,22 +6,22 @@ from game.board import Board
 
 class Evaluation_test(unittest.TestCase):
 
-
     def setUp(self):
 
         self.board1 = np.array(
-                          [[4, 2, 0, 0],
-                           [4, 2, 0, 0],
-                           [0, 0, 0, 0],
-                           [0, 0, 0, 0]])
-        self.board2 = np.array([[0, 64, 8, 4],
-                           [0, 0, 0, 4],
-                           [0, 4, 0, 4],
-                           [0, 0, 0, 4]])
-        self.board3 = np.array([[64, 8, 4, 0],
-                           [4, 0, 0, 0],
-                           [4, 0, 0, 0],
-                           [2, 0, 2, 0]])
+                          [[1024, 128, 64, 32],
+                           [32, 64, 32, 16],
+                           [8, 4, 16, 8],
+                           [4, 0, 2, 0]])
+        self.board2 = np.array(
+                          [[1024, 4, 64, 0],
+                           [32, 128, 32, 32],
+                           [8, 64, 16, 16],
+                           [4, 4, 2, 8]])
+        self.board3 = np.array([[1024, 128, 64, 32],
+                           [32, 64, 32, 16],
+                           [8, 4, 16, 8],
+                           [2, 4, 0, 2]])
 
         self.board4 = np.array([[128, 64, 32, 16],
                                 [32, 32, 32, 4],
@@ -55,12 +55,20 @@ class Evaluation_test(unittest.TestCase):
 
         print(AI.evaluation.board_evaluator_in_dir(test_board.get_board(),settings.Direction.down))
 
-    def test_board_evaluation_function(self):
+    def est_board_evaluation_function(self):
 
         for board in self.boards:
             board.print_board()
             print(AI.evaluation.board_evaluation_function(board))
             print("\n\n")
+
+    def test_ab_evaluation_function(self):
+
+        for board in self.boards:
+            board.print_board()
+            print(AI.evaluation.alphabeta_optimized_dir(board,1))
+            print("\n\n")
+
 
 
 

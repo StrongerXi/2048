@@ -68,3 +68,102 @@ simulating
 0   0   4   2
 4   0   0   0
 0   0   0   0
+
+
+# This is due to the fact that the weighted matrix is S shaped,
+So that when there are a lot of empty tiles, sometimes it favors
+moving right to fill up the higher weighted tiles at top right corner
+whcih moves highest tile from top left corner
+128   32   8   0
+16   4   4   0
+0   4   0   0
+0   0   0   0
+
+0   128   32   8
+0   0   16   8
+0   0   0   4
+2   0   0   0
+
+
+# WTF
+
+1024   512   256   64
+2   32   64   32
+2   8   16   8
+0   0   0   0
+
+0   0   2   0
+0   512   256   64
+1024   32   64   32
+4   8   16   8
+
+
+
+
+1024   128   64   32
+32   64   32   16
+8   4   16   8
+4   0   2   0
+
+1024   4   64   0
+32   128   32   32
+8   64   16   16
+4   4   2   8
+
+
+Direction.up
+16   16   8   4
+2   2   0   2
+0   0   0   0
+0   0   0   0
+
+Direction.right
+0   32   8   4
+0   0   2   4
+0   2   0   0
+0   0   0   0
+
+??? AB Eval
+
+
+
+
+Direction.left
+1024   512   256   64
+16   64   128   16
+16   32   8   2
+8   4   2   4
+
+Direction.down
+2   512   256   64
+1024   64   128   16
+32   32   8   2
+8   4   2   4
+
+
+
+Direction.left
+2048   128   8   0
+2   16   4   2
+0   0   0   0
+2   0   0   0
+
+Direction.right
+0   2048   128   8
+2   16   4   2
+0   0   2   0
+0   0   0   2
+
+
+
+Direction.up
+2048   1024   512   256
+2   8   16   64
+2   4   8   4
+0   0   0   0
+
+Direction.down
+0   0   0   0
+2   1024   512   256
+2048   8   16   64
+4   4   8   4

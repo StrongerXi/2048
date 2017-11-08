@@ -70,6 +70,112 @@ def evaluate_and_predict_optmized_move(board,steps = 2):
     return scores
 
 
+# Board N -> Direction
+# A helper function to initiate alpha-beta_deep_evaluate,
+# It returns the desired direction after running n levels of simulation
+# Assumption: The board is still moveable!
+def alphabeta_optimized_dir(board,n):
+
+    best_dir = None
+    best_score = -math.inf
+
+    for dir in settings.Direction:
+        if board.check_board_moveable_in_dir(dir):
+
+            copy_board = board.copy_board()
+            move_score = move_board(copy_board.get_board(),dir)
+
+            score = alphabeta_deep_evaluate(copy_board, 2*n - 1, -math.inf, math.inf, False)
+            #print(score, dir)
+
+            if score > best_score:
+                best_score = score
+                best_dir = dir
+
+
+    return best_dir
+
+# Board N Number Number Boolean -> Number
+# Board represents a node
+# N represents the depth for searching
+# Alpha and Beta are Numbers
+# Boolean signifies whether it's board/mover's turn
+# Returns the direction of the immediate last move and current board score
+def alphabeta_deep_evaluate(board, depth, alpha, beta, mover):
+
+    if depth == 0:
+        return board_evaluation_function(board)
+
+    if not board.check_board_moveable():
+        return settings.DEAD_BOARD_PENALTY
+
+    if mover:
+
+        potential_higher_alpha = -math.inf
+
+        for dir in settings.Direction:
+
+            if board.check_board_moveable_in_dir(dir):
+
+                new_board_for_move = board.copy_board()
+
+                merge_score = move_board(new_board_for_move.get_board(), dir)
+
+                expected_score = alphabeta_deep_evaluate(new_board_for_move, depth-1, alpha,beta, False)\
+                                 + merge_score
+
+                potential_higher_alpha = max(expected_score, potential_higher_alpha)
+
+                alpha = max(alpha,potential_higher_alpha)
+
+                if alpha >= beta:
+                    break
+
+
+        return potential_higher_alpha
+
+    else:
+
+        potential_lower_beta = math.inf
+
+        for index in range(0,board.get_board().size):
+            row = index % board.board_size
+            col = index // board.board_size
+            if board.get_tile(row , col) == 0:
+
+                base_tile_new_board = board.copy_board()
+                base_tile_new_board.set_tile(row,col,settings.TILE_BASE_VALUE)
+
+                base_tile_score = alphabeta_deep_evaluate(base_tile_new_board, depth-1, alpha,beta,True)
+
+
+
+                double_base_tile_new_board = board.copy_board()
+                double_base_tile_new_board.set_tile(row,col,2*settings.TILE_BASE_VALUE)
+
+                double_base_tile_score = alphabeta_deep_evaluate(double_base_tile_new_board, depth-1, alpha,beta,True)
+
+                combined_weighted_score = settings.TILE_TWO_PROBABILITY * base_tile_score +\
+                                          (1- settings.TILE_TWO_PROBABILITY) * double_base_tile_score
+
+                potential_lower_beta = min(potential_lower_beta, combined_weighted_score)
+                beta = min(potential_lower_beta, beta)
+
+                if alpha >= beta:
+                    break
+
+        return potential_lower_beta
+
+
+
+
+
+
+
+
+
+
+
 
 # Board Number -> Number
 # Returns the expected state fitness after having moved a board
@@ -108,14 +214,16 @@ def deep_evaluate_board_state(board, steps=0):
                     tile_two_score = get_highest_score(tile_two_deeper_moves_and_scores)
                     tile_four_score = get_highest_score(tile_four_deeper_moves_and_scores)
 
-                    state_score += tile_two_score + tile_four_score
+                    state_score += tile_two_score * settings.TILE_TWO_PROBABILITY \
+                                   + (1 - settings.TILE_TWO_PROBABILITY) * tile_four_score
+
                 else:
                     raise Exception("Steps smaller than zero exeption!")
 
                 all_possible_state_scores = np.append(all_possible_state_scores,state_score)
 
 
-    return np.median(all_possible_state_scores)
+    return np.min(all_possible_state_scores)
 
 
 
@@ -125,7 +233,6 @@ def deep_evaluate_board_state(board, steps=0):
 def evaluate_board_state(board):
 
     board_copy = board.copy_board()
-    board = None
 
     available_moves = evaluate_available_moves(board_copy)
     max_score = 0
@@ -226,15 +333,16 @@ def board_evaluation_function(board):
 
     board_matrix = np.copy(board.get_board())
 
-    for row in range(0,len(board_matrix[:,0])):
+    """for row in range(0,len(board_matrix[:,0])):
 
         for col in range(0,len(board_matrix[0,:])):
 
-            board_matrix[row,col] = normalize_tile_value(board_matrix[row,col])
+            board_matrix[row,col] = normalize_tile_value(board_matrix[row,col])"""
 
     multiplied_matrix = np.multiply(board_matrix, settings.TILE_WEIGHT_MATRIX)
 
-    empty_count_factor = (board.get_empty_count() + 1)/ board.get_board().size
+    empty_count_factor = 1
+    """"/ (board.get_board().size - board.get_empty_count())"""
 
 
 

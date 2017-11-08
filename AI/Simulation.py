@@ -52,24 +52,29 @@ class Simulation:
 
         while simFlag:
             #print("simulating")
-            #self.gs.board.print_board()
+            self.gs.board.print_board()
             #print("score: ", self.gs.get_score(), "\n\n\n")
 
-            moves_and_scores = evaluation.evaluate_and_predict_optmized_move(self.gs.board,1)
+            #moves_and_scores = evaluation.evaluate_and_predict_optmized_move(self.gs.board,1)
 
 
             score = "score: " + str(self.gs.get_score()) + "\n"
-            data.write(score)
-            data.write(str(moves_and_scores))
-            data.write("\n\n")
+            #data.write(score)
+            #data.write(str(moves_and_scores))
+            #data.write("\n\n")
 
-            optimizedDir = evaluation.find_optimized_move(moves_and_scores)
+            if (self.gs.get_score() > 20000):
+                optimizedDir = evaluation.alphabeta_optimized_dir(self.gs.board,2)
+            else:
+                optimizedDir = evaluation.alphabeta_optimized_dir(self.gs.board,2)
+
+            print(optimizedDir)
             round_score = move_board(self.gs.board.get_board(), optimizedDir)
 
             self.gs.board.generate_random_tile()
             self.gs.add_score(round_score)
 
-            data.write(self.gs.board.board_state_string())
+            #data.write(self.gs.board.board_state_string())
 
 
             if not self.gs.board.check_board_moveable():

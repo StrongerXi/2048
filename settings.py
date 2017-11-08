@@ -33,13 +33,13 @@ TILE_DIFFERENCE_TOLERANCE = 1 ** TILE_DIFFERENCE_POWER
 # Ex: if tolerance = 3, base value =2,  (16,2), (128,16) would be those edge cases.
 
 
-TILE__WEIGHT_MATRIX = np.array([[1024,512,256,128],
-                               [512, 256, 128, 64],
-                               [256, 128, 64, 32],
-                               [128,  64,  32,  16]])
+TILE__WEIGHT_MATRIX = np.array([[16384,2048,256,64],
+                               [2048, 256, 64, 8],
+                               [256, 64, 8, 1],
+                               [64,  8,  1,  0]])
 
 
 TILE_WEIGHT_MATRIX = np.array([[16384,8192,4096,2048],
-                               [1024, 512, 256, 128],
+                               [128, 256, 512, 1024],
                                [64, 32, 16, 8],
-                               [4,  2,  1,  0]])
+                               [0,  1,  2,  4]])
