@@ -35,26 +35,6 @@ class Evaluation_test(unittest.TestCase):
 
 
 
-    def est_evaluate_available_moves(self):
-
-        for board in self.boards:
-            board.print_board()
-            print(AI.evaluation.evaluate_available_moves(board))
-            print("\n\n")
-
-    def est_deep_evaluate_board_state(self):
-
-        for board in self.boards:
-            board.print_board()
-            print(AI.evaluation.evaluate_and_predict_optmized_move(board))
-            print("\n\n")
-
-    def est_board_evaluator_in_dir(self):
-        test_board = self.boards[0]
-        test_board.print_board()
-
-        print(AI.evaluation.board_evaluator_in_dir(test_board.get_board(),settings.Direction.down))
-
     def est_board_evaluation_function(self):
 
         for board in self.boards:
@@ -62,13 +42,19 @@ class Evaluation_test(unittest.TestCase):
             print(AI.evaluation.board_evaluation_function(board))
             print("\n\n")
 
-    def test_ab_evaluation_function(self):
+    def est_ab_evaluation_function(self):
 
         for board in self.boards:
             board.print_board()
             print(AI.evaluation.alphabeta_optimized_dir(board,1))
             print("\n\n")
 
+    def test_expectimax_evaluation_function(self):
+
+        for board in self.boards:
+            board.print_board()
+            print(AI.evaluation.expectimax_optimized_dir(board,1))
+            print("\n\n")
 
 
 

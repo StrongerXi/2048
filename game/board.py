@@ -185,6 +185,26 @@ class Board():
 
                 random_index -= 1
 
+    # Board -> Boolean
+    # Returns True if the maximum tile is in corner
+    def max_tile_in_corner(self):
+        mtile = 0
+        for row in range(0,self.board_size):
+
+            for col in range(0,self.board_size):
+
+                if self.get_tile(row,col) > mtile:
+                    mtile = self.get_tile(row,col)
+
+        for row in (0,self.board_size-1):
+
+            for col in (0,self.board_size-1):
+
+                if self.get_tile(row,col) == mtile:
+                    return True
+
+        return False
+
 
     # Board setting.Direction-> Boolean
     # Checks whether the board is moveable in particular direction
@@ -263,8 +283,8 @@ if __name__ == "__main__":
 
     x = np.array([[0,16,4,2],
                   [2,8,16,4],
-                  [8,4,2,16],
-                  [4,2,4,8]])
+                  [32,4,2,16],
+                  [0,2,4,8]])
 
 
 
@@ -274,6 +294,5 @@ if __name__ == "__main__":
 
     bd.print_board()
 
-    for dir in settings.Direction:
-        print(dir, bd.check_board_moveable_in_dir(dir))
+    print(bd.max_tile_in_corner())
 

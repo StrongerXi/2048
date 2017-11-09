@@ -3,6 +3,8 @@ from game.game_runner import GameRunner
 
 from AI.Simulation import Simulation
 
+import settings
+
 
 
 
@@ -12,4 +14,16 @@ from AI.Simulation import Simulation
 
 sim = Simulation()
 
-sim.evaluation_with_prediction_simulator(100)
+#settings.TILE_WEIGHT_MATRIX = settings.TILE_WEIGHT_MATRIX1
+
+#sim.alphabeta_evaluation_sim(3,30)
+
+settings.TILE_WEIGHT_MATRIX = settings.TILE_WEIGHT_MATRIX2
+
+sim.alphabeta_evaluation_sim(3,30)
+
+#settings.TILE_WEIGHT_MATRIX = settings.TILE_WEIGHT_MATRIX3
+
+#sim.alphabeta_evaluation_sim(3,30)
+
+

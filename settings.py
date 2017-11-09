@@ -23,7 +23,8 @@ class Direction(Enum):
 # Simulation Constants
 DEFAULT_NUMBER_OF_STEPS = 3
 DEFAULT_SIMULATIONS_IN_EACH_DIRECTION = 10
-DEAD_BOARD_PENALTY = -1000
+DEAD_BOARD_PENALTY = -100000
+
 
 # Evaluator Function Constants
 TILE_DIFFERENCE_POWER = 2
@@ -32,14 +33,24 @@ TILE_DIFFERENCE_TOLERANCE = 1 ** TILE_DIFFERENCE_POWER
 # that still allows fitness to be positive
 # Ex: if tolerance = 3, base value =2,  (16,2), (128,16) would be those edge cases.
 
+TILE_WEIGHT_MATRIX = 0
 
-TILE__WEIGHT_MATRIX = np.array([[16384,2048,256,64],
+TILE_WEIGHT_MATRIX1 = np.array([[16384,2048,256,64],
                                [2048, 256, 64, 8],
                                [256, 64, 8, 1],
                                [64,  8,  1,  0]])
 
 
-TILE_WEIGHT_MATRIX = np.array([[16384,8192,4096,2048],
+
+TILE_WEIGHT_MATRIX2 = np.array([[16384,8192,4096,2048],
                                [128, 256, 512, 1024],
                                [64, 32, 16, 8],
                                [0,  1,  2,  4]])
+
+
+
+TILE_WEIGHT_MATRIX3 = np.array(
+                              [[2048,512,100,4],
+                               [512, 100, 4, -8],
+                               [100, 4, -8, -64],
+                               [4,  -8,  -64, -256]])

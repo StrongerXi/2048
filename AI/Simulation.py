@@ -14,6 +14,13 @@ class Simulation:
         self.gs = GameState()
         self.gs.board.generate_random_tile()
 
+    def expectimax_evaluation_sim(self,steps,rounds):
+
+        self.evaluation_abstraction(evaluation.expectimax_optimized_dir)
+
+    def alphabeta_evaluation_sim(self,steps,rounds):
+
+        self.evaluation_abstraction(evaluation.alphabeta_optimized_dir, steps, rounds)
 
 
 
@@ -21,7 +28,7 @@ class Simulation:
     # however, it implements prediction moves so that the movement won't
     # focus on maximizing scores for each move; instead, the ai also considers
     # how each move will affect the board in the preceding rounds.
-    def evaluation_with_prediction_simulator(self,rounds = 1):
+    def evaluation_abstraction(self,eval_f,steps,rounds):
 
         rounds = rounds
 
@@ -30,7 +37,7 @@ class Simulation:
         while rounds > 0:
 
             print("round: ", rounds)
-            score = self.evaluation_with_prediction_single_simulation()
+            score = self.evaluation_with_single_simulation_abstraction(eval_f,steps)
             scores.append(score)
             rounds -= 1
 
@@ -38,15 +45,15 @@ class Simulation:
         print("median is : ", np.median(np.array(scores)))
 
 
-    def evaluation_with_prediction_single_simulation(self):
+    def evaluation_with_single_simulation_abstraction(self,eval_f,steps):
 
 
-        data = open("data.txt",'a')
+        #data = open("data.txt",'a')
 
         self.gs.reset()
         self.gs.board.generate_random_tile()
 
-        data.write(self.gs.board.board_state_string())
+        #data.write(self.gs.board.board_state_string())
 
         simFlag = self.gs.board.check_board_moveable()
 
@@ -55,20 +62,16 @@ class Simulation:
             self.gs.board.print_board()
             #print("score: ", self.gs.get_score(), "\n\n\n")
 
-            #moves_and_scores = evaluation.evaluate_and_predict_optmized_move(self.gs.board,1)
-
-
             score = "score: " + str(self.gs.get_score()) + "\n"
             #data.write(score)
-            #data.write(str(moves_and_scores))
             #data.write("\n\n")
 
-            if (self.gs.get_score() > 20000):
-                optimizedDir = evaluation.alphabeta_optimized_dir(self.gs.board,2)
+            if self.gs.get_score() > 20000:
+                optimizedDir = eval_f(self.gs.board,steps)
             else:
-                optimizedDir = evaluation.alphabeta_optimized_dir(self.gs.board,2)
+                optimizedDir = eval_f(self.gs.board,steps-1)
 
-            print(optimizedDir)
+            #print(optimizedDir)
             round_score = move_board(self.gs.board.get_board(), optimizedDir)
 
             self.gs.board.generate_random_tile()
@@ -84,66 +87,6 @@ class Simulation:
 
         print("Simulation has ended, score is: ", self.gs.get_score())
 
-
-        return self.gs.get_score()
-
-
-
-
-
-    #
-    # This simulator uses evaluation_simulation to make optimized move, and simulates the game
-    def evaluation_simulator(self,rounds = 1):
-
-        rounds = rounds
-
-        scores = []
-
-        while rounds > 0:
-
-            print("round: ", rounds)
-            score = self.evaluation_single_simulation()
-            scores.append(score)
-            rounds -= 1
-
-        print("scores for the rounds simulated are: ", scores)
-        print("median is : ", np.median(np.array(scores)))
-
-
-
-
-
-    #This function uses a evaluator function to find the optimized moving direction
-    # It simulates by making the corresponding move.
-    #
-    def evaluation_single_simulation(self):
-
-        self.gs.reset()
-        self.gs.board.generate_random_tile()
-
-        simFlag = True
-
-        while simFlag:
-
-            #self.gs.board.print_board()
-            #print("score: ", self.gs.get_score(), "\n\n\n")
-
-
-            moves_score = evaluation.evaluate_available_moves(self.gs.board.copy_board())
-            print(moves_score)
-            optimizedDir = evaluation.find_optimized_move(moves_score)
-            round_score = move_board(self.gs.board.get_board(), optimizedDir)
-
-            self.gs.board.generate_random_tile()
-            self.gs.add_score(round_score)
-
-
-            if not self.gs.board.check_board_moveable():
-                simFlag = False
-
-
-        self.gs.board.print_board()
-        print("Simulation has ended")
 
         return self.gs.get_score()
 
