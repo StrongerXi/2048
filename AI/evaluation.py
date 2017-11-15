@@ -9,7 +9,6 @@ import game.board
 # Ideas: for size = 4
 
 # TODO: #There should be a penalty for rows such as [256,32,4,0], when the differences are too large
-#       # Try creating a dynamic tile/row weight based on the location of largest tile
         #Also, the constants need to be adjusted, and it is suggested that the programmer reads through several
         #entire simulations to identify the reasons that keeps AI from scoring higher
         #Random Simulation stopped moving even though the board is still moveable
@@ -76,6 +75,7 @@ def alphabeta_optimized_dir(board,n):
 # Boolean signifies whether it's board/mover's turn
 # Returns the direction of the immediate last move and current board score
 def alphabeta_deep_evaluate(board, depth, alpha, beta, mover):
+
 
     if depth == 0:
         return board_evaluation_function(board)
@@ -226,7 +226,7 @@ def expectimax_deep_evaluate(board, depth, mover):
 
                     double_base_tile_score = expectimax_deep_evaluate(double_base_tile_new_board, depth - 1, True)
 
-                    sum_of_expected_scores = settings.TILE_TWO_PROBABILITY * base_tile_score + \
+                    sum_of_expected_scores += settings.TILE_TWO_PROBABILITY * base_tile_score + \
                                               (1 - settings.TILE_TWO_PROBABILITY) * double_base_tile_score
 
 
@@ -309,12 +309,10 @@ def board_evaluation_function(board):
 
     multiplied_matrix = np.multiply(board_matrix, settings.TILE_WEIGHT_MATRIX)
 
-    empty_count_factor = 1
-    """"/ (board.get_board().size - board.get_empty_count())"""
+    #empty_count_factor = 1 / (board.get_board().size - board.get_empty_count())
+    #print(board.get_empty_count())
 
-
-
-    return np.sum(multiplied_matrix)  * empty_count_factor
+    return np.sum(multiplied_matrix) # * empty_count_factor
 
 
 # np.Array -> np.Array
@@ -356,6 +354,9 @@ if __name__ == "__main__":
         bd.set_row(row,board[row,:])
 
     rotboard = np.rot90(board,2)
+    bd.print_board()
+
+    print(board_evaluation_function(bd))
 
 
     """for n in range(0, 4):
@@ -392,6 +393,7 @@ if __name__ == "__main__":
 
 if __name__ == "__main_":
 
+    print("a")
     bd = game.board.Board()
     bd.generate_random_tile()
     bd.print_board()

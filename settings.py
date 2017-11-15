@@ -33,7 +33,6 @@ TILE_DIFFERENCE_TOLERANCE = 1 ** TILE_DIFFERENCE_POWER
 # that still allows fitness to be positive
 # Ex: if tolerance = 3, base value =2,  (16,2), (128,16) would be those edge cases.
 
-TILE_WEIGHT_MATRIX = 0
 
 TILE_WEIGHT_MATRIX1 = np.array([[16384,2048,256,64],
                                [2048, 256, 64, 8],
@@ -54,3 +53,6 @@ TILE_WEIGHT_MATRIX3 = np.array(
                                [512, 100, 4, -8],
                                [100, 4, -8, -64],
                                [4,  -8,  -64, -256]])
+
+
+TILE_WEIGHT_MATRIX = TILE_WEIGHT_MATRIX2

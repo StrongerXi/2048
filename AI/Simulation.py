@@ -16,7 +16,7 @@ class Simulation:
 
     def expectimax_evaluation_sim(self,steps,rounds):
 
-        self.evaluation_abstraction(evaluation.expectimax_optimized_dir)
+        self.evaluation_abstraction(evaluation.expectimax_optimized_dir, steps ,rounds)
 
     def alphabeta_evaluation_sim(self,steps,rounds):
 
@@ -48,12 +48,12 @@ class Simulation:
     def evaluation_with_single_simulation_abstraction(self,eval_f,steps):
 
 
-        #data = open("data.txt",'a')
+        data = open("data.txt",'a')
 
         self.gs.reset()
         self.gs.board.generate_random_tile()
 
-        #data.write(self.gs.board.board_state_string())
+        data.write(self.gs.board.board_state_string())
 
         simFlag = self.gs.board.check_board_moveable()
 
@@ -63,11 +63,11 @@ class Simulation:
             #print("score: ", self.gs.get_score(), "\n\n\n")
 
             score = "score: " + str(self.gs.get_score()) + "\n"
-            #data.write(score)
-            #data.write("\n\n")
+            data.write(score)
+            data.write("\n\n")
 
             if self.gs.get_score() > 20000:
-                optimizedDir = eval_f(self.gs.board,steps)
+                optimizedDir = eval_f(self.gs.board, steps)
             else:
                 optimizedDir = eval_f(self.gs.board,steps-1)
 
@@ -77,7 +77,7 @@ class Simulation:
             self.gs.board.generate_random_tile()
             self.gs.add_score(round_score)
 
-            #data.write(self.gs.board.board_state_string())
+            data.write(self.gs.board.board_state_string())
 
 
             if not self.gs.board.check_board_moveable():

@@ -288,8 +288,6 @@ if __name__ == "__main__":
 
 
 
-
-
     bd.set_board(x)
 
     bd.print_board()
